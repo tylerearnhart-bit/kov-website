@@ -14,6 +14,24 @@ FONTS = ('<link rel="preconnect" href="https://fonts.googleapis.com">\n'
 
 SITE = "https://kovinteriors.com"
 
+# Google Tag Manager — container GTM-TP3B8PBS.
+# The <head> half must stay as high in the head as possible; charset and
+# viewport come first only because browsers require them in the first bytes.
+GTM_ID = "GTM-TP3B8PBS"
+
+GTM_HEAD = """<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','%s');</script>
+<!-- End Google Tag Manager -->""" % GTM_ID
+
+GTM_BODY = """<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=%s"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->""" % GTM_ID
+
 
 def head(title, desc, canonical="/", jsonld=""):
     ld = f'\n<script type="application/ld+json">{jsonld}</script>' if jsonld else ""
@@ -22,6 +40,7 @@ def head(title, desc, canonical="/", jsonld=""):
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+{GTM_HEAD}
 <title>{title}</title>
 <meta name="description" content="{desc}">
 <meta name="theme-color" content="#577693">
@@ -48,6 +67,7 @@ def head(title, desc, canonical="/", jsonld=""):
 <link rel="stylesheet" href="assets/styles.css">{ld}
 </head>
 <body>
+{GTM_BODY}
 <script>document.documentElement.classList.add('js');</script>
 <a class="skip-link" href="#main">Skip to content</a>
 """
@@ -127,7 +147,7 @@ FOOTER = """
     </div>
     <div class="footer-bottom">
       <span>&copy; 2026 K&Ouml;V Simply Interiors. All rights reserved.</span>
-      <span class="legal-todo">Privacy policy and terms of service to be added before launch.</span>
+      <span class="footer-legal"><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms &amp; Conditions</a></span>
     </div>
   </div>
 </footer>
@@ -660,6 +680,226 @@ def location_page(name, address_html, map_url, phone, phone_href, handle,
 
 
 # --------------------------------------------------------------------------
+# Legal pages. Copy supplied by KÖV and published as written — do not reword.
+# Update the effective date in BOTH the hero and the source document together.
+
+def legal_hero(label, title, effective):
+    return """
+<main id="main">
+  <section class="page-hero tone-dark">
+    <div class="shell">
+      <p class="crumbs"><a href="index.html">Home</a> &nbsp;/&nbsp; {label}</p>
+      <span class="eyebrow"><span class="dots gold" aria-hidden="true"><i></i><i></i></span> Legal</span>
+      <h1>{title}</h1>
+      <p class="effective">Effective date: {effective}</p>
+    </div>
+  </section>
+""".format(label=label, title=title, effective=effective)
+
+
+PRIVACY_MAIN = legal_hero("Privacy Policy", "Privacy Policy", "October 6, 2026") + """
+  <section class="band">
+    <div class="shell legal">
+      <p class="lede">K&Ouml;V Simply Interiors LLC (&ldquo;K&Ouml;V Simply Interiors,&rdquo; &ldquo;we,&rdquo; &ldquo;us,&rdquo; or &ldquo;our&rdquo;) respects your privacy. This Privacy Policy explains what information we collect through www.kovinteriors.com (the &ldquo;Site&rdquo;), how we use and share it, and the choices you have. By using the Site, you agree to the practices described here.</p>
+
+      <h2>1. Information we collect</h2>
+      <p>We collect information you choose to give us and information gathered automatically when you browse the Site.</p>
+      <div class="table-wrap">
+        <table class="legal-table">
+          <thead><tr><th>Category</th><th>What it includes</th><th>How we get it</th></tr></thead>
+          <tbody>
+            <tr><td>Inquiry and consultation requests</td><td>Name, email address, phone number, the showroom you would like to work with, project scope, and project details</td><td>You enter it in our contact or consultation form</td></tr>
+            <tr><td>Email list</td><td>Email address, and your name if you provide it</td><td>You sign up to receive updates from us</td></tr>
+            <tr><td>Communications</td><td>The content of emails, calls, or messages you send us</td><td>You contact us directly</td></tr>
+            <tr><td>Usage and device data</td><td>IP address, approximate location (city or region), browser and device type, pages viewed, links clicked, time on the Site, and the website that referred you</td><td>Collected automatically through cookies, pixels, and similar technologies</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Please do not include sensitive information in the project details field. This includes Social Security numbers, financial account numbers, and health information. We do not need it to respond to your inquiry.</p>
+      <p>We do not sell products or accept payments through the Site, so we do not collect payment card information online.</p>
+
+      <h2>2. How we use your information</h2>
+      <p>We use the information we collect to:</p>
+      <ul>
+        <li>Respond to your inquiries and route consultation requests to the showroom you selected</li>
+        <li>Schedule and prepare for consultations, and communicate with you about your project</li>
+        <li>Send email updates, design inspiration, and promotions if you have signed up for our email list</li>
+        <li>Understand how visitors use the Site so we can improve its content and performance</li>
+        <li>Measure and improve our advertising, including showing our ads to people who have visited the Site</li>
+        <li>Protect the Site and our business from spam, fraud, and misuse</li>
+        <li>Comply with legal obligations and enforce our Terms &amp; Conditions</li>
+      </ul>
+      <p>If you give us your phone number, we may call or text you about your inquiry. We will not send marketing text messages unless you have separately agreed to receive them.</p>
+
+      <h2>3. Cookies, analytics, and advertising</h2>
+      <p>The Site uses cookies, pixels, and similar technologies. These are small files or pieces of code that recognize your browser and record how you interact with the Site. Some are set by us and some by the third parties below.</p>
+      <div class="table-wrap">
+        <table class="legal-table">
+          <thead><tr><th>Tool</th><th>What it does</th><th>Learn more or opt out</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>Google Analytics</td>
+              <td>Measures visits and how people use the Site, such as pages viewed, time on page, device type, and approximate location</td>
+              <td><a href="https://policies.google.com/technologies/partner-sites" target="_blank" rel="noopener">How Google uses data from sites that use its services</a> &middot; <a href="https://tools.google.com/dlpage/gaoptout" target="_blank" rel="noopener">Google Analytics opt-out browser add-on</a></td>
+            </tr>
+            <tr>
+              <td>Meta Pixel</td>
+              <td>Records actions you take on the Site, such as viewing a page or submitting a form. Meta may link this activity to your Facebook or Instagram account so we can measure our ads and show ads to people who have visited the Site</td>
+              <td><a href="https://www.facebook.com/privacy/policy" target="_blank" rel="noopener">Meta Privacy Policy</a> &middot; <a href="https://www.facebook.com/adpreferences" target="_blank" rel="noopener">Meta ad preferences</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Google and Meta collect this information directly from your browser and use it under their own privacy policies.</p>
+      <p>You can also limit tracking in these ways:</p>
+      <ul>
+        <li><strong>Browser settings.</strong> Most browsers let you block or delete cookies. If you block all cookies, some parts of the Site may not work as intended.</li>
+        <li><strong>Industry opt-out.</strong> You can opt out of interest-based advertising from participating companies at <a href="https://optout.aboutads.info" target="_blank" rel="noopener">optout.aboutads.info</a>.</li>
+      </ul>
+      <p>Opt-outs are usually specific to the browser and device you use. You may need to repeat them if you clear your cookies or switch devices.</p>
+
+      <h2>4. How we share information</h2>
+      <p>We do not sell your personal information for money. We share it only in these situations:</p>
+      <ul>
+        <li><strong>Service providers.</strong> Companies that help us run the Site and our business receive the information they need to do that work. These include:
+          <ul>
+            <li>Web3Forms, which processes our form submissions and delivers them to our email. Web3Forms stores submissions for a limited period and uses spam-filtering services that may receive your IP address and email address. See the <a href="https://web3forms.com/privacy" target="_blank" rel="noopener">Web3Forms Privacy Policy</a>.</li>
+            <li>Our website hosting provider, which stores Site files and standard server logs.</li>
+            <li>Our email marketing providers, Mailchimp and Drip, which store our email list and send our emails.</li>
+          </ul>
+        </li>
+        <li><strong>Analytics and advertising partners.</strong> Google and Meta receive usage and device data through the tools described in Section 3. Some state laws may treat this as &ldquo;sharing&rdquo; personal information or as &ldquo;targeted advertising.&rdquo; Section 3 explains how to opt out.</li>
+        <li><strong>Within our business.</strong> We share inquiry details with the showroom and team members who will respond to you.</li>
+        <li><strong>Legal and safety reasons.</strong> We may disclose information to comply with a law, court order, or government request, or to protect the rights, property, or safety of K&Ouml;V Simply Interiors, our clients, or others.</li>
+        <li><strong>Business transfers.</strong> If we merge with, sell, or transfer all or part of our business, your information may be transferred as part of that transaction.</li>
+        <li><strong>With your consent.</strong> We share information in other ways when you ask or allow us to.</li>
+      </ul>
+      <p>We do not rent or trade our email list or inquiry contacts to other companies for their own marketing.</p>
+
+      <h2>5. Your choices and privacy rights</h2>
+      <p><strong>Marketing emails.</strong> You can unsubscribe at any time by using the link at the bottom of any marketing email or by emailing us. We may still send you non-marketing messages, such as replies to your inquiries.</p>
+      <p><strong>Cookies and advertising.</strong> See Section 3 for ways to limit analytics and advertising tracking.</p>
+      <p><strong>Access, correction, and deletion.</strong> You may ask us what personal information we hold about you, ask us to correct it, or ask us to delete it. Email your request to <a href="mailto:contactHL@kovinteriors.com">contactHL@kovinteriors.com</a>. We may need to verify your identity before acting on a request. We will respond within a reasonable time, and generally within 45 days. We may keep certain information where the law requires or allows it, such as records of a signed project.</p>
+      <p><strong>State privacy rights.</strong> Depending on where you live, state law may give you additional rights. These can include the right to receive a copy of your information and the right to opt out of targeted advertising. We will honor the rights that apply to you, and we will not treat you differently for exercising them. If we decline your request, you may reply to ask us to reconsider.</p>
+      <p><strong>Do Not Track.</strong> Some browsers send a &ldquo;Do Not Track&rdquo; signal. There is no common standard for how websites should respond, so the Site does not currently respond to these signals.</p>
+
+      <h2>6. How long we keep information</h2>
+      <p>We keep personal information only as long as we need it for the purposes in this policy. Inquiry details are kept while we are in contact with you and for a reasonable period afterward. If you become a client, we keep project records as long as needed for business, tax, and legal purposes. Email list information is kept until you unsubscribe. Analytics and advertising data is kept under the retention settings of Google and Meta.</p>
+
+      <h2>7. Security</h2>
+      <p>We use reasonable administrative and technical measures to protect your information, including encrypted (HTTPS) connections to the Site. No website or method of transmission is completely secure, and we cannot guarantee absolute security.</p>
+
+      <h2>8. Children&rsquo;s privacy</h2>
+      <p>The Site is intended for adults. It is not directed to children under 13, and we do not knowingly collect personal information from them. If you believe a child has given us personal information, please contact us and we will delete it.</p>
+
+      <h2>9. Links to other websites</h2>
+      <p>The Site may link to websites and social media pages we do not control. Their privacy practices are governed by their own policies, and we encourage you to read them.</p>
+
+      <h2>10. Visitors from outside the United States</h2>
+      <p>We operate in the United States, and the Site is intended for people located here. Some of our service providers process information in other countries. If you use the Site from outside the United States, your information will be transferred to and processed in the United States and those other countries, where privacy laws may differ from those where you live.</p>
+
+      <h2>11. Changes to this policy</h2>
+      <p>We may update this Privacy Policy from time to time. When we do, we will post the updated version on this page and change the effective date above. Significant changes will be noted on the Site. Your continued use of the Site after an update means you accept the revised policy.</p>
+
+      <h2>12. Contact us</h2>
+      <p>If you have questions about this Privacy Policy or want to make a privacy request, contact us:</p>
+      <address class="legal-address">
+        K&Ouml;V Simply Interiors LLC<br>
+        11406 E 8th St, Reed City, MI 49677<br>
+        Email: <a href="mailto:info@kovinteriors.com">info@kovinteriors.com</a>
+      </address>
+
+      <p class="legal-xref">See also our <a href="terms.html">Terms &amp; Conditions</a>.</p>
+    </div>
+  </section>
+</main>
+"""
+
+
+TERMS_MAIN = legal_hero("Terms &amp; Conditions", "Terms &amp; Conditions", "October 6, 2026") + """
+  <section class="band">
+    <div class="shell legal">
+      <p class="lede">These Terms &amp; Conditions (&ldquo;Terms&rdquo;) govern your use of www.kovinteriors.com (the &ldquo;Site&rdquo;), operated by K&Ouml;V Simply Interiors LLC (&ldquo;K&Ouml;V Simply Interiors,&rdquo; &ldquo;we,&rdquo; &ldquo;us,&rdquo; or &ldquo;our&rdquo;). By using the Site, you agree to these Terms. If you do not agree, please do not use the Site.</p>
+
+      <h2>1. Using the Site</h2>
+      <p>The Site is intended for adults. You must be at least 18 years old to submit an inquiry or consultation request.</p>
+      <p>You may use the Site for lawful, personal purposes, such as learning about our work and contacting us about a project. You agree not to:</p>
+      <ul>
+        <li>Use the Site in any way that violates a law or the rights of others</li>
+        <li>Submit false, misleading, or abusive information through our forms</li>
+        <li>Send spam or unsolicited advertising through the Site</li>
+        <li>Copy, scrape, or harvest content or data from the Site by automated means</li>
+        <li>Use Site content to train or develop artificial intelligence or machine learning tools without our written permission</li>
+        <li>Introduce viruses or other harmful code, or attempt to gain unauthorized access to the Site or its systems</li>
+        <li>Interfere with the Site&rsquo;s operation or with anyone else&rsquo;s use of it</li>
+      </ul>
+      <p>We may suspend or block access to the Site for anyone who violates these Terms. We may also change, suspend, or discontinue any part of the Site at any time without notice.</p>
+
+      <h2>2. Our content and intellectual property</h2>
+      <p>The Site and everything on it belong to K&Ouml;V Simply Interiors or our licensors. This includes text, photographs, project images, design concepts, renderings, floor plans, graphics, logos, and the Site&rsquo;s layout. This content is protected by copyright, trademark, and other laws.</p>
+      <p>You may view the Site and share links to it. You may save or print pages for your own personal, non-commercial reference. You may not otherwise copy, reproduce, republish, modify, distribute, or sell Site content, or use it for any commercial purpose, without our written permission.</p>
+      <p>&ldquo;K&Ouml;V Simply Interiors,&rdquo; our logos, and related names are trademarks of K&Ouml;V Simply Interiors LLC. Other names and brands shown on the Site belong to their owners. Nothing on the Site gives you a license to use any trademark.</p>
+
+      <h2>3. Copyright concerns</h2>
+      <p>If you believe content on the Site infringes your copyright, email <a href="mailto:contactHL@kovinteriors.com">contactHL@kovinteriors.com</a>. Please describe the work, tell us where it appears on the Site, and include your contact information. We will review your notice and respond promptly.</p>
+
+      <h2>4. Site content is for general information</h2>
+      <p>The Site shares our work and ideas for general information and inspiration. It is not professional design, construction, engineering, or other advice for your specific space. Please do not rely on Site content as a substitute for a consultation.</p>
+      <p>Photographs show completed projects and showroom displays. Colors, finishes, and materials may look different in person and on different screens. Products, materials, and services shown may change or become unavailable. Any pricing or timing information on the Site is an estimate only and is not an offer or a quote.</p>
+      <p>We work to keep the Site accurate and current, but it may contain errors or outdated information. We may correct or update content at any time.</p>
+
+      <h2>5. Inquiries and consultation requests</h2>
+      <p>Submitting an inquiry or consultation request does not create a client relationship or a contract, and it does not obligate either of us to move forward. We will make reasonable efforts to respond, but we do not guarantee a response or a response time.</p>
+      <p>Any design services or products we provide are governed by a separate written agreement between you and K&Ouml;V Simply Interiors. If that agreement conflicts with these Terms, that agreement controls for those services or products.</p>
+      <p>You are responsible for the accuracy of the information you submit. By submitting project details, you confirm you have the right to share them. You also give us permission to use them to respond to you and to evaluate and prepare for your project.</p>
+
+      <h2>6. Privacy</h2>
+      <p>Our <a href="privacy.html">Privacy Policy</a> explains how we collect, use, and share information through the Site, including through cookies, analytics, and advertising tools. By using the Site, you acknowledge the practices described in the Privacy Policy.</p>
+
+      <h2>7. Third-party links and services</h2>
+      <p>The Site may link to websites, social media pages, and services we do not own or control, and it uses third-party tools to process forms and measure traffic. We are not responsible for the content, products, or practices of third parties. Your use of their sites and services is governed by their own terms and policies.</p>
+
+      <h2>8. Disclaimer of warranties</h2>
+      <p>The Site and its content are provided &ldquo;as is&rdquo; and &ldquo;as available.&rdquo; To the fullest extent permitted by law, K&Ouml;V Simply Interiors disclaims all warranties, express or implied, including implied warranties of merchantability, fitness for a particular purpose, and non-infringement. We do not warrant that the Site will be uninterrupted, secure, or free of errors or harmful components, or that its content is accurate or complete.</p>
+
+      <h2>9. Limitation of liability</h2>
+      <p>To the fullest extent permitted by law, K&Ouml;V Simply Interiors and its owners, employees, and agents will not be liable for any indirect, incidental, special, consequential, or punitive damages, or for lost profits or lost data, arising from or related to your use of, or inability to use, the Site. Our total liability for all claims related to the Site will not exceed one hundred U.S. dollars ($100).</p>
+      <p>Some laws do not allow certain warranty disclaimers or liability limits, so parts of Sections 8 and 9 may not apply to you. Nothing in these Terms limits liability that cannot be limited by law. This section covers the Site only. Our responsibilities for design services or products are set out in the separate written agreement described in Section 5.</p>
+
+      <h2>10. Indemnification</h2>
+      <p>You agree to indemnify and hold harmless K&Ouml;V Simply Interiors and its owners, employees, and agents from claims, losses, and expenses, including reasonable attorneys&rsquo; fees, that arise from your violation of these Terms or your misuse of the Site.</p>
+
+      <h2>11. Governing law and disputes</h2>
+      <p>These Terms are governed by the laws of the State of Michigan, without regard to its conflict-of-law rules. Any dispute related to the Site or these Terms must be brought in the state or federal courts serving Osceola County, Michigan. You and we consent to the jurisdiction of those courts.</p>
+      <p>Before filing a claim, please contact us at <a href="mailto:contactHL@kovinteriors.com">contactHL@kovinteriors.com</a> so we can try to resolve the issue informally.</p>
+
+      <h2>12. Changes to these Terms</h2>
+      <p>We may update these Terms from time to time. When we do, we will post the updated version on this page and change the effective date above. Your continued use of the Site after an update means you accept the revised Terms.</p>
+
+      <h2>13. General</h2>
+      <ul>
+        <li><strong>Entire agreement.</strong> These Terms and our Privacy Policy are the entire agreement between you and us about your use of the Site.</li>
+        <li><strong>Severability.</strong> If a court finds any part of these Terms unenforceable, the rest remains in effect.</li>
+        <li><strong>No waiver.</strong> If we do not enforce a provision, we have not waived our right to enforce it later.</li>
+        <li><strong>Assignment.</strong> We may assign these Terms as part of a sale or transfer of our business. You may not assign them.</li>
+      </ul>
+
+      <h2>14. Contact us</h2>
+      <p>Questions about these Terms can be sent to:</p>
+      <address class="legal-address">
+        K&Ouml;V Simply Interiors LLC<br>
+        11406 E 8th St, Reed City, MI 49677<br>
+        Email: <a href="mailto:info@kovinteriors.com">info@kovinteriors.com</a>
+      </address>
+
+      <p class="legal-xref">See also our <a href="privacy.html">Privacy Policy</a>.</p>
+    </div>
+  </section>
+</main>
+"""
+
+
+# --------------------------------------------------------------------------
 PAGES = {
     "index.html": (
         "KÖV Simply Interiors",
@@ -707,6 +947,14 @@ PAGES = {
              ("Saturday", "Closed"),
              ("Sunday", "Closed")],
             "paris")),
+    "privacy.html": (
+        "Privacy Policy &mdash; KÖV Simply Interiors",
+        "How KÖV Simply Interiors collects, uses and shares information through kovinteriors.com, and the choices you have.",
+        "", PRIVACY_MAIN),
+    "terms.html": (
+        "Terms &amp; Conditions &mdash; KÖV Simply Interiors",
+        "The terms that govern your use of kovinteriors.com, operated by KÖV Simply Interiors LLC.",
+        "", TERMS_MAIN),
 }
 
 CANON = {
@@ -714,6 +962,8 @@ CANON = {
     "gallery.html": ("/gallery", ""),
     "houghton-lake.html": ("/houghton-lake", '{"@context":"https://schema.org","@type":"HomeAndConstructionBusiness","name":"KÖV Simply Interiors — Houghton Lake","url":"https://kovinteriors.com/houghton-lake","telephone":"+1-989-422-3545","image":"https://kovinteriors.com/assets/og-image.jpg","parentOrganization":{"@type":"Organization","name":"KÖV Simply Interiors","url":"https://kovinteriors.com"},"address":{"@type":"PostalAddress","streetAddress":"2485 W Houghton Lake Drive","addressLocality":"Houghton Lake","addressRegion":"MI","postalCode":"48629","addressCountry":"US"},"openingHoursSpecification":[{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday"],"opens":"09:00","closes":"17:00"},{"@type":"OpeningHoursSpecification","dayOfWeek":"Saturday","opens":"10:00","closes":"15:00"}]}'),
     "paris.html": ("/paris", '{"@context":"https://schema.org","@type":"HomeAndConstructionBusiness","name":"KÖV Simply Interiors — Paris","url":"https://kovinteriors.com/paris","telephone":"+1-231-796-0330","image":"https://kovinteriors.com/assets/og-image.jpg","parentOrganization":{"@type":"Organization","name":"KÖV Simply Interiors","url":"https://kovinteriors.com"},"address":{"@type":"PostalAddress","streetAddress":"21498 Northland Drive","addressLocality":"Paris","addressRegion":"MI","postalCode":"49338","addressCountry":"US"},"openingHoursSpecification":[{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday"],"opens":"10:00","closes":"17:00"}]}'),
+    "privacy.html": ("/privacy", ""),
+    "terms.html": ("/terms", ""),
 }
 
 for fname, (title, desc, active, main) in PAGES.items():
