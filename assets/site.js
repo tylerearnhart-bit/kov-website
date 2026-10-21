@@ -191,6 +191,13 @@
       var data = {};
       new FormData(form).forEach(function (v, k) { data[k] = v; });
       data.name = ((data.first_name || '') + ' ' + (data.last_name || '')).trim();
+      
+      var SHOWROOM_KEYS = {
+        'Houghton Lake, MI': '4b04a78e-1222-40c4-ba0d-5f8aaee83861',
+        'Paris, MI':         '871aa06c-781d-41d2-8c8c-293cc3b3d4f4'
+      };
+      var routed = SHOWROOM_KEYS[data.preferred_showroom];
+      if (routed) data.access_key = routed;
 
       fetch('https://api.web3forms.com/submit', {
         method: 'POST',
