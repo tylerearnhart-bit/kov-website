@@ -165,6 +165,71 @@
     });
   }
 
+  /* ---------- Showroom chooser popup ----------
+     Any "#consult" link opens this, EXCEPT on a page that has its own form —
+     there the link just scrolls to it. The popup's two links are duplicated
+     in the homepage chooser section, so turning JavaScript off degrades to a
+     normal page load rather than a dead button. */
+  var modal = document.getElementById('showroomModal');
+  var hasOwnForm = !!document.getElementById('consultForm');
+
+  if (modal) {
+    var lastTrigger = null;
+
+    function modalOpen(trigger) {
+      lastTrigger = trigger || null;
+      modal.hidden = false;
+      document.body.style.overflow = 'hidden';
+      // next frame, so the transition has a chance to run
+      requestAnimationFrame(function () { modal.classList.add('open'); });
+      var first = modal.querySelector('.chooser-card');
+      if (first) first.focus();
+    }
+
+    function modalClose() {
+      modal.classList.remove('open');
+      document.body.style.overflow = '';
+      window.setTimeout(function () { modal.hidden = true; }, 200);
+      if (lastTrigger && lastTrigger.focus) lastTrigger.focus();
+    }
+
+    Array.prototype.forEach.call(modal.querySelectorAll('[data-modal-close]'), function (el) {
+      el.addEventListener('click', modalClose);
+    });
+
+    document.addEventListener('click', function (e) {
+      var link = e.target.closest ? e.target.closest('a[href$="#consult"]') : null;
+      if (!link) return;
+      // Inside the popup itself, let the link do its job.
+      if (modal.contains(link)) return;
+
+      if (hasOwnForm) {
+        // This page has a form — scroll to it instead of asking again.
+        var target = document.getElementById('consult');
+        if (target) {
+          e.preventDefault();
+          target.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+          if (history.replaceState) history.replaceState(null, '', '#consult');
+        }
+        return;
+      }
+      e.preventDefault();
+      modalOpen(link);
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (modal.hidden) return;
+      if (e.key === 'Escape') { modalClose(); return; }
+      if (e.key !== 'Tab') return;
+      // Keep focus inside the dialog while it is open.
+      var items = modal.querySelectorAll('a[href], button:not([disabled])');
+      if (!items.length) return;
+      var first = items[0], last = items[items.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    });
+  }
+
   /* ---------- Consultation form -> Web3Forms ----------
      Posts as JSON so the styled confirmation stays on the page. If JavaScript
      never runs, the form still submits natively to the same endpoint. */
@@ -191,13 +256,7 @@
       var data = {};
       new FormData(form).forEach(function (v, k) { data[k] = v; });
       data.name = ((data.first_name || '') + ' ' + (data.last_name || '')).trim();
-      
-      var SHOWROOM_KEYS = {
-        'Houghton Lake, MI': '4b04a78e-1222-40c4-ba0d-5f8aaee83861',
-        'Paris, MI':         'a81fc8cb-e34f-49f9-8072-7b567a0f5ef6'
-      };
-      var routed = SHOWROOM_KEYS[data.preferred_showroom];
-      if (routed) data.access_key = routed;
+
 
       fetch('https://api.web3forms.com/submit', {
         method: 'POST',
