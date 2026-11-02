@@ -242,6 +242,32 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </div>
 </footer>
 
+<!-- Showroom chooser popup. Opened by site.js from any "#consult" link on a
+     page that has no form of its own. The same two links also exist inline in
+     the homepage CHOOSER section, so this is enhancement, not a dependency:
+     with JavaScript off the link still lands somewhere useful. -->
+<div class="modal" id="showroomModal" role="dialog" aria-modal="true" aria-labelledby="showroomModalTitle" hidden>
+  <div class="modal-backdrop" data-modal-close></div>
+  <div class="modal-panel">
+    <button class="modal-close" type="button" aria-label="Close" data-modal-close>&#10005;</button>
+    <span class="eyebrow" style="justify-content:center;"><span class="dots gold" aria-hidden="true"><i></i><i></i></span> Start Here</span>
+    <h2 id="showroomModalTitle">Which showroom is closest to you?</h2>
+    <p class="modal-sub">Pick a location and we&rsquo;ll take you to that team&rsquo;s consultation form.</p>
+    <div class="chooser-grid">
+      <a class="chooser-card" href="houghton-lake.html#consult">
+        <span class="chooser-name">Houghton Lake</span>
+        <span class="chooser-addr">2485 W Houghton Lake Drive</span>
+        <span class="chooser-go">Book here <span class="btn-arrow" aria-hidden="true">&rarr;</span></span>
+      </a>
+      <a class="chooser-card" href="paris.html#consult">
+        <span class="chooser-name">Paris</span>
+        <span class="chooser-addr">21498 Northland Drive</span>
+        <span class="chooser-go">Book here <span class="btn-arrow" aria-hidden="true">&rarr;</span></span>
+      </a>
+    </div>
+  </div>
+</div>
+
 <script src="assets/site.js"></script>
 </body>
 </html>

@@ -152,6 +152,32 @@ FOOTER = """
   </div>
 </footer>
 
+<!-- Showroom chooser popup. Opened by site.js from any "#consult" link on a
+     page that has no form of its own. The same two links also exist inline in
+     the homepage CHOOSER section, so this is enhancement, not a dependency:
+     with JavaScript off the link still lands somewhere useful. -->
+<div class="modal" id="showroomModal" role="dialog" aria-modal="true" aria-labelledby="showroomModalTitle" hidden>
+  <div class="modal-backdrop" data-modal-close></div>
+  <div class="modal-panel">
+    <button class="modal-close" type="button" aria-label="Close" data-modal-close>&#10005;</button>
+    <span class="eyebrow" style="justify-content:center;"><span class="dots gold" aria-hidden="true"><i></i><i></i></span> Start Here</span>
+    <h2 id="showroomModalTitle">Which showroom is closest to you?</h2>
+    <p class="modal-sub">Pick a location and we&rsquo;ll take you to that team&rsquo;s consultation form.</p>
+    <div class="chooser-grid">
+      <a class="chooser-card" href="houghton-lake.html#consult">
+        <span class="chooser-name">Houghton Lake</span>
+        <span class="chooser-addr">2485 W Houghton Lake Drive</span>
+        <span class="chooser-go">Book here <span class="btn-arrow" aria-hidden="true">&rarr;</span></span>
+      </a>
+      <a class="chooser-card" href="paris.html#consult">
+        <span class="chooser-name">Paris</span>
+        <span class="chooser-addr">21498 Northland Drive</span>
+        <span class="chooser-go">Book here <span class="btn-arrow" aria-hidden="true">&rarr;</span></span>
+      </a>
+    </div>
+  </div>
+</div>
+
 <script src="assets/site.js"></script>
 </body>
 </html>
@@ -178,6 +204,126 @@ def shot(slug, alt, caption, fixed=False, span=2):
 # --------------------------------------------------------------------------
 # HOME
 # --------------------------------------------------------------------------
+# --------------------------------------------------------------------------
+# CONSULTATION FORM
+# Each showroom has its own Web3Forms key, hard-wired into its own page.
+# One key delivers to one inbox, so the page the visitor is on decides where
+# the lead goes. Nothing is chosen at runtime.
+#
+# IMPORTANT: a key only delivers to the address it was created from. Changing
+# the value below does not change the destination — that is set in the
+# Web3Forms dashboard for that form.
+SHOWROOM_FORM_KEYS = {
+    "houghton": ("4b04a78e-1222-40c4-ba0d-5f8aaee83861", "Houghton Lake, MI"),
+    "paris":    ("a81fc8cb-e34f-49f9-8072-7b567a0f5ef6", "Paris, MI"),
+}
+
+
+def consult_form(which, blurb_name):
+    access_key, showroom = SHOWROOM_FORM_KEYS[which]
+    return """
+  <section class="band band-tint" id="consult">
+    <div class="shell consult-grid">
+      <div>
+        <span class="eyebrow"><span class="dots gold" aria-hidden="true"><i></i><i></i></span> Start Here</span>
+        <h2>Tell us what you&rsquo;re finishing.</h2>
+        <p class="consult-note">You&rsquo;re booking with our <strong>{blurb_name}</strong> showroom. Prefer the other location? <a href="{other_href}">Switch to {other_name}</a>.</p>
+        <ul class="promise">
+          <li><span class="dots" aria-hidden="true"><i></i><i></i></span><span>A real person reads every request &mdash; usually back to you the same business day.</span></li>
+          <li><span class="dots" aria-hidden="true"><i></i><i></i></span><span>No pressure, no quote-by-guess. We give you a scope and a lead time.</span></li>
+          <li><span class="dots" aria-hidden="true"><i></i><i></i></span><span>Builders and designers welcome &mdash; ask about trade scheduling.</span></li>
+        </ul>
+      </div>
+
+      <div class="form-card tone-light" id="consultCard">
+        <form class="form-body" id="consultForm" action="https://api.web3forms.com/submit" method="POST" novalidate>
+          <input type="hidden" name="access_key" value="{access_key}">
+          <input type="hidden" name="preferred_showroom" value="{showroom}">
+          <input type="hidden" name="subject" value="New consultation request ({showroom}) &mdash; K&Ouml;V website">
+          <input type="hidden" name="from_name" value="K&Ouml;V Simply Interiors Website">
+          <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+          <div class="field-row">
+            <div class="field">
+              <label for="fname">First Name</label>
+              <input id="fname" name="first_name" type="text" autocomplete="given-name" required>
+            </div>
+            <div class="field">
+              <label for="lname">Last Name</label>
+              <input id="lname" name="last_name" type="text" autocomplete="family-name" required>
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label for="email">Email</label>
+              <input id="email" name="email" type="email" autocomplete="email" required>
+            </div>
+            <div class="field">
+              <label for="phone">Phone</label>
+              <input id="phone" name="phone" type="tel" autocomplete="tel">
+            </div>
+          </div>
+          <div class="field">
+            <label for="scope">Project Scope</label>
+            <select id="scope" name="project_scope">
+              <option>Flooring</option>
+              <option>Cabinetry</option>
+              <option>Tile &amp; Stone</option>
+              <option>Window Coverings</option>
+              <option>Whole-home finish</option>
+              <option>Kitchen</option>
+              <option>Bathroom</option>
+              <option>Not sure yet</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="details">Project Details</label>
+            <textarea id="details" name="message" placeholder="Rooms involved, rough timeline, anything already selected."></textarea>
+          </div>
+          <div class="form-foot">
+            <button class="btn btn-solid" type="submit">Send Request <span class="btn-arrow" aria-hidden="true">&rarr;</span></button>
+            <span class="fine">We&rsquo;ll follow up by email or phone, whichever you prefer.</span>
+          </div>
+          <p class="form-error" id="formError" role="alert" hidden>Something went wrong sending that. Please try again, or call the showroom directly.</p>
+        </form>
+
+        <div class="form-success" id="consultSuccess" role="status">
+          <span class="dots gold" aria-hidden="true" style="justify-content:center;"><i></i><i></i></span>
+          <h3>Request received.</h3>
+          <p>Thanks &mdash; your request is on its way to our {blurb_name} team. We&rsquo;ll be in touch shortly to set up your consultation.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+""".format(access_key=access_key, showroom=showroom, blurb_name=blurb_name,
+           other_href=("paris.html#consult" if which == "houghton" else "houghton-lake.html#consult"),
+           other_name=("Paris" if which == "houghton" else "Houghton Lake"))
+
+
+# The showroom chooser. Lives in the page as real links, so it works with no
+# JavaScript at all; site.js reuses the same two choices inside the popup.
+CHOOSER = """
+  <section class="band band-tint" id="consult">
+    <div class="shell chooser-wrap">
+      <span class="eyebrow" style="justify-content:center;"><span class="dots gold" aria-hidden="true"><i></i><i></i></span> Start Here</span>
+      <h2>Which showroom is closest to you?</h2>
+      <p class="chooser-sub">Pick a location and we&rsquo;ll take you to that team&rsquo;s consultation form.</p>
+      <div class="chooser-grid">
+        <a class="chooser-card" href="houghton-lake.html#consult">
+          <span class="chooser-name">Houghton Lake</span>
+          <span class="chooser-addr">2485 W Houghton Lake Drive</span>
+          <span class="chooser-go">Book here <span class="btn-arrow" aria-hidden="true">&rarr;</span></span>
+        </a>
+        <a class="chooser-card" href="paris.html#consult">
+          <span class="chooser-name">Paris</span>
+          <span class="chooser-addr">21498 Northland Drive</span>
+          <span class="chooser-go">Book here <span class="btn-arrow" aria-hidden="true">&rarr;</span></span>
+        </a>
+      </div>
+    </div>
+  </section>
+"""
+
+
 HOME_MAIN = f"""
 <main id="main">
 
@@ -349,86 +495,7 @@ HOME_MAIN = f"""
   </section>
 
   <!-- CONSULTATION -->
-  <section class="band band-tint" id="consult">
-    <div class="shell consult-grid">
-      <div>
-        <span class="eyebrow"><span class="dots gold" aria-hidden="true"><i></i><i></i></span> Start Here</span>
-        <h2>Tell us what you're finishing.</h2>
-        <ul class="promise">
-          <li><span class="dots" aria-hidden="true"><i></i><i></i></span><span>A real person reads every request &mdash; usually back to you the same business day.</span></li>
-          <li><span class="dots" aria-hidden="true"><i></i><i></i></span><span>No pressure, no quote-by-guess. We give you a scope and a lead time.</span></li>
-          <li><span class="dots" aria-hidden="true"><i></i><i></i></span><span>Builders and designers welcome &mdash; ask about trade scheduling.</span></li>
-        </ul>
-      </div>
-
-      <div class="form-card tone-light" id="consultCard">
-        <form class="form-body" id="consultForm" action="https://api.web3forms.com/submit" method="POST" novalidate>
-          <input type="hidden" name="access_key" value="4b04a78e-1222-40c4-ba0d-5f8aaee83861">
-          <input type="hidden" name="subject" value="New consultation request &mdash; K&Ouml;V website">
-          <input type="hidden" name="from_name" value="K&Ouml;V Simply Interiors Website">
-          <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
-          <div class="field-row">
-            <div class="field">
-              <label for="fname">First Name</label>
-              <input id="fname" name="first_name" type="text" autocomplete="given-name" required>
-            </div>
-            <div class="field">
-              <label for="lname">Last Name</label>
-              <input id="lname" name="last_name" type="text" autocomplete="family-name" required>
-            </div>
-          </div>
-          <div class="field-row">
-            <div class="field">
-              <label for="email">Email</label>
-              <input id="email" name="email" type="email" autocomplete="email" required>
-            </div>
-            <div class="field">
-              <label for="phone">Phone</label>
-              <input id="phone" name="phone" type="tel" autocomplete="tel">
-            </div>
-          </div>
-          <div class="field-row">
-            <div class="field">
-              <label for="showroom">Preferred Showroom</label>
-              <select id="showroom" name="preferred_showroom" required>
-                <option value="" disabled selected>Choose a showroom</option>
-                <option>Houghton Lake, MI</option>
-                <option>Paris, MI</option>
-              </select>
-            </div>
-            <div class="field">
-              <label for="scope">Project Scope</label>
-              <select id="scope" name="project_scope">
-                <option>Flooring</option>
-                <option>Cabinetry</option>
-                <option>Tile &amp; Stone</option>
-                <option>Window Coverings</option>
-                <option>Whole-home finish</option>
-                <option>Kitchen</option>
-                <option>Bathroom</option>
-                <option>Not sure yet</option>
-              </select>
-            </div>
-          </div>
-          <div class="field">
-            <label for="details">Project Details</label>
-            <textarea id="details" name="message" placeholder="Rooms involved, rough timeline, anything already selected."></textarea>
-          </div>
-          <div class="form-foot">
-            <button class="btn btn-solid" type="submit">Send Request <span class="btn-arrow" aria-hidden="true">&rarr;</span></button>
-            <span class="fine">We'll follow up by email or phone, whichever you prefer.</span>
-          </div>
-          <p class="form-error" id="formError" role="alert" hidden>Something went wrong sending that. Please try again, or call the showroom nearest you.</p>
-        </form>
-
-        <div class="form-success" id="consultSuccess" role="status">
-          <span class="dots gold" aria-hidden="true" style="justify-content:center;"><i></i><i></i></span>
-          <h3>Request received.</h3>
-          <p>Thanks &mdash; your request is on its way to the K&Ouml;V team. We'll be in touch shortly to set up your consultation.</p>
-        </div>
-      </div>
-    </div>
-  </section>
+{CHOOSER}
 </main>
 """
 
@@ -666,15 +733,7 @@ def location_page(name, address_html, map_url, phone, phone_href, handle,
     </div>
   </section>
 
-  <section class="band band-tint">
-    <div class="shell" style="text-align:center;">
-      <span class="eyebrow" style="justify-content:center;"><span class="dots gold" aria-hidden="true"><i></i><i></i></span> Start Here</span>
-      <h2 style="font-size:clamp(1.9rem,3.4vw,2.7rem);margin-top:1rem;">Book time with a design consultant.</h2>
-      <div class="btn-row">
-        <a class="btn btn-solid btn-wide" href="index.html#consult">Request a Free Consultation <span class="btn-arrow" aria-hidden="true">&rarr;</span></a>
-      </div>
-    </div>
-  </section>
+{consult_form(active, name)}
 </main>
 """
 
@@ -920,7 +979,8 @@ PAGES = {
             "989.422.3545", "+19894223545", "KOVHoughtonLake",
             [("Alissa Burden", "Office Manager", "alissa-burden"),
              ("Tara Kubiak", "Designer / Sales", "tara-kubiak"),
-             ("Cassidy Westdrop", "Designer / Sales", "cassidy-westdrop"),
+             # Display name is Westdorp; photo filename keeps the older spelling.
+             ("Cassidy Westdorp", "Designer / Sales", "cassidy-westdrop"),
              ("Autumn Jobson", "Sales Associate", "autumn-jobson")],
             False,
             None,

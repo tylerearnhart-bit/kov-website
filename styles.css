@@ -673,3 +673,49 @@ html{ scroll-behavior: smooth; }
 
 /* placeholder option reads as a prompt until a real showroom is chosen */
 .field select:has(option[value=""]:checked){ color: var(--ink-mute); }
+
+/* ---------- Showroom chooser (homepage section + popup) ---------- */
+.chooser-wrap{ text-align: center; }
+.chooser-wrap h2{ font-size: clamp(1.9rem, 3.4vw, 2.7rem); margin-top: 1rem; }
+.chooser-sub{ margin-top: 0.9rem; color: var(--ink-soft); }
+.chooser-grid{ display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 1.25rem;
+  margin-top: 2.25rem; text-align: left; }
+@media (max-width: 620px){ .chooser-grid{ grid-template-columns: 1fr; } }
+
+.chooser-card{ display: flex; flex-direction: column; gap: 0.35rem; padding: 1.6rem 1.75rem;
+  background: #fff; border: 1px solid var(--line); border-radius: 8px; text-decoration: none;
+  transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease; }
+.chooser-card:hover, .chooser-card:focus-visible{ transform: translateY(-3px);
+  border-color: var(--blue); box-shadow: 0 14px 34px rgba(16,24,32,0.12); }
+.chooser-name{ font-family: var(--display, var(--body)); font-size: 1.35rem; color: var(--ink); }
+.chooser-addr{ font-size: 0.88rem; color: var(--ink-mute); }
+.chooser-go{ margin-top: 0.75rem; font-family: var(--label); text-transform: uppercase;
+  font-size: 0.7rem; letter-spacing: 0.15em; color: var(--blue); }
+
+/* Which showroom this form belongs to, with an escape hatch to the other one. */
+.consult-note{ margin-top: 1rem; font-size: 0.92rem; color: var(--ink-soft); }
+.consult-note strong{ color: var(--ink); }
+
+/* ---------- Popup ---------- */
+.modal[hidden]{ display: none; }
+.modal{ position: fixed; inset: 0; z-index: 120; display: grid; place-items: center;
+  padding: 1.25rem; }
+.modal-backdrop{ position: absolute; inset: 0; background: rgba(16,24,32,0.62);
+  opacity: 0; transition: opacity .2s ease; }
+.modal.open .modal-backdrop{ opacity: 1; }
+.modal-panel{ position: relative; width: min(42rem, 100%); max-height: 90vh; overflow-y: auto;
+  background: var(--blue-50, #F2F7FA); border-radius: 12px; padding: 2.5rem clamp(1.4rem, 4vw, 2.75rem);
+  text-align: center; box-shadow: 0 30px 70px rgba(16,24,32,0.3);
+  opacity: 0; transform: translateY(12px) scale(0.985); transition: opacity .2s ease, transform .2s ease; }
+.modal.open .modal-panel{ opacity: 1; transform: none; }
+.modal-panel h2{ font-size: clamp(1.5rem, 3vw, 2.1rem); margin-top: 0.9rem; }
+.modal-sub{ margin-top: 0.75rem; color: var(--ink-soft); }
+.modal-close{ position: absolute; top: 0.9rem; right: 0.9rem; width: 2.25rem; height: 2.25rem;
+  display: grid; place-items: center; border: 0; border-radius: 50%; cursor: pointer;
+  background: transparent; color: var(--ink-mute); font-size: 1rem; line-height: 1;
+  transition: background .2s ease, color .2s ease; }
+.modal-close:hover{ background: rgba(16,24,32,0.07); color: var(--ink); }
+@media (prefers-reduced-motion: reduce){
+  .modal-backdrop, .modal-panel{ transition: none; }
+  .modal-panel{ transform: none; }
+}
