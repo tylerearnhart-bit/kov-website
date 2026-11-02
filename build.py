@@ -1,6 +1,21 @@
 #!/usr/bin/env python3
 """Assembles the KÖV site pages from shared header/footer parts."""
-import os, re
+import os, re, io
+import hashlib
+
+
+def asset(path):
+    """assets/site.js -> assets/site.js?v=1a2b3c4d
+
+    The hash is of the file's own bytes, so the URL changes only when the file
+    changes. That is what lets /assets/* keep a one-year immutable cache while
+    still reaching visitors instantly: a changed file is simply a new URL that
+    nobody has cached. Without this, returning visitors run last year's
+    JavaScript until they hard-refresh.
+    """
+    full = os.path.join(OUT, path)
+    digest = hashlib.md5(io.open(full, "rb").read()).hexdigest()[:8]
+    return "%s?v=%s" % (path, digest)
 
 OUT = os.path.dirname(os.path.abspath(__file__))
 
@@ -64,7 +79,7 @@ def head(title, desc, canonical="/", jsonld=""):
 <meta name="twitter:description" content="{desc}">
 <meta name="twitter:image" content="{SITE}/assets/og-image.jpg">
 {FONTS}
-<link rel="stylesheet" href="assets/styles.css">{ld}
+<link rel="stylesheet" href="{asset("assets/styles.css")}">{ld}
 </head>
 <body>
 {GTM_BODY}
@@ -110,6 +125,8 @@ def header(active=""):
 </header>
 """
 
+
+SITE_JS = asset("assets/site.js")
 
 FOOTER = """
 <footer class="site-footer tone-dark">
@@ -178,7 +195,7 @@ FOOTER = """
   </div>
 </div>
 
-<script src="assets/site.js"></script>
+""" + '<script src="' + SITE_JS + '"></script>' + """
 </body>
 </html>
 """
@@ -1032,3 +1049,15 @@ for fname, (title, desc, active, main) in PAGES.items():
     with open(os.path.join(OUT, fname), "w", encoding="utf-8") as f:
         f.write(html)
     print("wrote", fname, len(html) // 1024, "KB")
+
+
+# 404.html is hand-maintained rather than generated, so refresh its asset
+# references here too — otherwise the not-found page keeps serving whatever
+# JavaScript and CSS a visitor cached a year ago.
+_p404 = os.path.join(OUT, "404.html")
+if os.path.exists(_p404):
+    _h = io.open(_p404, encoding="utf-8").read()
+    _h = re.sub(r'assets/styles\.css(\?v=[a-f0-9]+)?', asset("assets/styles.css"), _h)
+    _h = re.sub(r'assets/site\.js(\?v=[a-f0-9]+)?',   asset("assets/site.js"),   _h)
+    io.open(_p404, "w", encoding="utf-8").write(_h)
+    print("refreshed 404.html asset refs")

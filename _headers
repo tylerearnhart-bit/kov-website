@@ -3,6 +3,9 @@
   X-Frame-Options: SAMEORIGIN
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: geolocation=(), microphone=(), camera=()
+  Cache-Control: public, max-age=0, must-revalidate
 
+# Safe to cache hard: build.py appends a content hash to these URLs, so a
+# changed file is a different URL. Never reference them without the ?v= hash.
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
