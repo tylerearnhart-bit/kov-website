@@ -202,6 +202,9 @@
       if (!link) return;
       // Inside the popup itself, let the link do its job.
       if (modal.contains(link)) return;
+      // A chooser card has already named its showroom — in the popup or in the
+      // homepage section. Asking again would be a pointless extra click.
+      if (link.classList.contains('chooser-card')) return;
 
       if (hasOwnForm) {
         // This page has a form — scroll to it instead of asking again.
