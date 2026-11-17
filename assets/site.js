@@ -269,7 +269,24 @@
         .then(function (r) { return r.json(); })
         .then(function (res) {
           if (res && res.success) {
-            card.classList.add('is-sent');
+            /* Hand the conversion to Tag Manager before leaving the page, so a
+               GTM trigger can fire on the event as well as on the destination
+               URL. Harmless if GTM is not loaded. */
+            window.dataLayer = window.dataLayer || [];
+            window.dataLayer.push({
+              event: 'consult_form_submit',
+              preferred_showroom: data.preferred_showroom || ''
+            });
+
+            /* Redirect ONLY here, inside the success branch. An error or a
+               network failure falls through to the error message below and
+               the visitor stays put with their answers intact. */
+            var thanks = form.getAttribute('data-thanks');
+            if (thanks) {
+              window.location.assign(thanks);
+              return;
+            }
+            card.classList.add('is-sent');   /* fallback if the attribute is missing */
           } else {
             if (errorBox) errorBox.hidden = false;
           }
