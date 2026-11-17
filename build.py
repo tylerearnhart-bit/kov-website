@@ -48,8 +48,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- End Google Tag Manager (noscript) -->""" % GTM_ID
 
 
-def head(title, desc, canonical="/", jsonld=""):
+def head(title, desc, canonical="/", jsonld="", robots=""):
     ld = f'\n<script type="application/ld+json">{jsonld}</script>' if jsonld else ""
+    rb = f'\n<meta name="robots" content="{robots}">' if robots else ""
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -59,7 +60,7 @@ def head(title, desc, canonical="/", jsonld=""):
 <title>{title}</title>
 <meta name="description" content="{desc}">
 <meta name="theme-color" content="#577693">
-<link rel="canonical" href="{SITE}{canonical}">
+<link rel="canonical" href="{SITE}{canonical}">{rb}
 
 <link rel="icon" href="assets/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
@@ -253,8 +254,9 @@ def consult_form(which, blurb_name):
       </div>
 
       <div class="form-card tone-light" id="consultCard">
-        <form class="form-body" id="consultForm" action="https://api.web3forms.com/submit" method="POST" novalidate>
+        <form class="form-body" id="consultForm" action="https://api.web3forms.com/submit" method="POST" novalidate data-thanks="{thanks_page}">
           <input type="hidden" name="access_key" value="{access_key}">
+          <input type="hidden" name="redirect" value="{site}/{thanks_page}">
           <input type="hidden" name="preferred_showroom" value="{showroom}">
           <input type="hidden" name="subject" value="New consultation request ({showroom}) &mdash; K&Ouml;V website">
           <input type="hidden" name="from_name" value="K&Ouml;V Simply Interiors Website">
@@ -312,6 +314,8 @@ def consult_form(which, blurb_name):
     </div>
   </section>
 """.format(access_key=access_key, showroom=showroom, blurb_name=blurb_name,
+           site=SITE,
+           thanks_page=("thank-you-houghton-lake.html" if which == "houghton" else "thank-you-paris.html"),
            other_href=("paris.html#consult" if which == "houghton" else "houghton-lake.html#consult"),
            other_name=("Paris" if which == "houghton" else "Houghton Lake"))
 
@@ -756,6 +760,42 @@ def location_page(name, address_html, map_url, phone, phone_href, handle,
 
 
 # --------------------------------------------------------------------------
+# THANK-YOU PAGES
+# One per showroom, so Google and Meta each get a distinct URL to count as a
+# conversion. Reached ONLY by a successful form submit: no nav links anywhere,
+# noindex in the head, absent from sitemap.xml.
+#
+# Deliberately NOT disallowed in robots.txt — a crawler has to fetch the page
+# to see the noindex tag. Blocking it in robots.txt would hide the tag and the
+# URL could still surface in results.
+THANKS_PAGES = {
+    "houghton": ("Houghton Lake", "989.422.3545", "+19894223545"),
+    "paris":    ("Paris",         "231.796.0330", "+12317960330"),
+}
+
+
+def thankyou_page(which):
+    name, phone, phone_href = THANKS_PAGES[which]
+    return """
+<main id="main">
+  <section class="band thanks-band">
+    <div class="shell thanks-wrap">
+      <img class="thanks-logo" src="assets/kov-logo.png" alt="K&Ouml;V Simply Interiors" width="900" height="196">
+      <span class="eyebrow" style="justify-content:center;"><span class="dots gold" aria-hidden="true"><i></i><i></i></span> Request Received</span>
+      <h1>Thanks, we&rsquo;ll be in touch within 24&nbsp;hours.</h1>
+      <p class="thanks-msg">We look forward to discussing your project.</p>
+      <p class="thanks-meta">Your request is with our <strong>{name}</strong> team. Need us sooner? Call <a href="tel:{phone_href}">{phone}</a>.</p>
+      <div class="btn-row" style="justify-content:center;">
+        <a class="btn btn-solid" href="index.html">Back to Home <span class="btn-arrow" aria-hidden="true">&rarr;</span></a>
+        <a class="btn btn-ghost" href="gallery.html">See Our Work</a>
+      </div>
+    </div>
+  </section>
+</main>
+""".format(name=name, phone=phone, phone_href=phone_href)
+
+
+# --------------------------------------------------------------------------
 # Legal pages. Copy supplied by KÖV and published as written — do not reword.
 # Update the effective date in BOTH the hero and the source document together.
 
@@ -1028,6 +1068,14 @@ PAGES = {
         "Privacy Policy &mdash; KÖV Simply Interiors",
         "How KÖV Simply Interiors collects, uses and shares information through kovinteriors.com, and the choices you have.",
         "", PRIVACY_MAIN),
+    "thank-you-houghton-lake.html": (
+        "Thank You &mdash; KÖV Simply Interiors",
+        "Your consultation request has been received by our Houghton Lake showroom.",
+        "", thankyou_page("houghton")),
+    "thank-you-paris.html": (
+        "Thank You &mdash; KÖV Simply Interiors",
+        "Your consultation request has been received by our Paris showroom.",
+        "", thankyou_page("paris")),
     "terms.html": (
         "Terms &amp; Conditions &mdash; KÖV Simply Interiors",
         "The terms that govern your use of kovinteriors.com, operated by KÖV Simply Interiors LLC.",
@@ -1040,12 +1088,19 @@ CANON = {
     "houghton-lake.html": ("/houghton-lake", '{"@context":"https://schema.org","@type":"HomeAndConstructionBusiness","name":"KÖV Simply Interiors — Houghton Lake","url":"https://kovinteriors.com/houghton-lake","telephone":"+1-989-422-3545","image":"https://kovinteriors.com/assets/og-image.jpg","parentOrganization":{"@type":"Organization","name":"KÖV Simply Interiors","url":"https://kovinteriors.com"},"address":{"@type":"PostalAddress","streetAddress":"2485 W Houghton Lake Drive","addressLocality":"Houghton Lake","addressRegion":"MI","postalCode":"48629","addressCountry":"US"},"openingHoursSpecification":[{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday"],"opens":"09:00","closes":"17:00"},{"@type":"OpeningHoursSpecification","dayOfWeek":"Saturday","opens":"10:00","closes":"15:00"}]}'),
     "paris.html": ("/paris", '{"@context":"https://schema.org","@type":"HomeAndConstructionBusiness","name":"KÖV Simply Interiors — Paris","url":"https://kovinteriors.com/paris","telephone":"+1-231-796-0330","image":"https://kovinteriors.com/assets/og-image.jpg","parentOrganization":{"@type":"Organization","name":"KÖV Simply Interiors","url":"https://kovinteriors.com"},"address":{"@type":"PostalAddress","streetAddress":"21498 Northland Drive","addressLocality":"Paris","addressRegion":"MI","postalCode":"49338","addressCountry":"US"},"openingHoursSpecification":[{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday"],"opens":"10:00","closes":"17:00"}]}'),
     "privacy.html": ("/privacy", ""),
+    "thank-you-houghton-lake.html": ("/thank-you-houghton-lake", ""),
+    "thank-you-paris.html": ("/thank-you-paris", ""),
     "terms.html": ("/terms", ""),
 }
 
+# Conversion landing pages must never be indexed: the only legitimate way to
+# reach one is by submitting the form.
+NOINDEX = {"thank-you-houghton-lake.html", "thank-you-paris.html"}
+
 for fname, (title, desc, active, main) in PAGES.items():
     canonical, jsonld = CANON[fname]
-    html = head(title, desc, canonical, jsonld) + header(active) + main + FOOTER
+    robots = "noindex, nofollow" if fname in NOINDEX else ""
+    html = head(title, desc, canonical, jsonld, robots) + header(active) + main + FOOTER
     with open(os.path.join(OUT, fname), "w", encoding="utf-8") as f:
         f.write(html)
     print("wrote", fname, len(html) // 1024, "KB")
